@@ -1,0 +1,14 @@
+# Local launch script contains a private API key.
+start_claude_mimo.bat
+
+# Common local secret files.
+.env
+.env.*
+*.key
+*.pem
+
+# Local caches and temporary files.
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
