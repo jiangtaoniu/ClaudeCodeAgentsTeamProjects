@@ -6,7 +6,7 @@ import numpy as np
 
 # Add OpenPCDet to PYTHONPATH
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OPENPCDET_DIR = os.path.join(ROOT_DIR, "third_party", "OpenPCDet")
+OPENPCDET_DIR = os.path.join(ROOT_DIR, "02_model_export", "OpenPCDet")
 sys.path.append(OPENPCDET_DIR)
 
 from pcdet.config import cfg, cfg_from_yaml_file

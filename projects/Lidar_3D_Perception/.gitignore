@@ -1,0 +1,46 @@
+# Local launch script contains a private API key.
+start_claude_mimo.bat
+
+# Common local secret files.
+.env
+.env.*
+*.key
+*.pem
+
+# Local caches and temporary files.
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# ---------------------------------------------------
+# Large Model Files & Checkpoints
+# ---------------------------------------------------
+*.onnx
+*.engine
+*.pth
+*.pt
+*.tflite
+*.pb
+
+# ---------------------------------------------------
+# Large Python Packages / Wheels
+# ---------------------------------------------------
+*.whl
+*.tar.gz
+
+# ---------------------------------------------------
+# ROS2 Build / Log Directories
+# ---------------------------------------------------
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+install/
+build/
+
+# ---------------------------------------------------
+# Datasets and Binaries
+# ---------------------------------------------------
+data/
+*.bin
+*.pcd

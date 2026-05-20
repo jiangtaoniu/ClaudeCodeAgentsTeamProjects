@@ -1,0 +1,1 @@
+/home/a1439775520/projects/ClaudeCodeAgentsTeamProjects/projects/Lidar_3D_Perception/06_docs_and_results/install_all_env.sh

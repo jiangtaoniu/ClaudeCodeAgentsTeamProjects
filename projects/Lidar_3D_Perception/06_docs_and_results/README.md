@@ -16,22 +16,14 @@
 ## 项目结构
 
 ```text
-lidar_trt_detection/
-├── README.md                    # 项目说明
-├── docs/                        # 文档
-│   ├── 项目说明书.md             # 完整项目规划
-│   └── *.sh                     # WSL 环境配置脚本
-├── ros2_ws/                     # ROS2 工作空间
-│   └── src/
-│       └── lidar_trt_detection/ # ROS2 感知节点 (待开发)
-├── models/                      # 模型文件
-│   ├── onnx/                    # ONNX 模型
-│   └── engine/                  # TensorRT engine
-├── scripts/                     # 工具脚本
-├── third_party/                 # 第三方依赖
-│   └── OpenPCDet/               # 点云检测框架
-└── assets/                      # 演示资源
-    └── result_images/
+projects/Lidar_3D_Perception/
+├── 01_environment_setup/       # 核心环境配置脚本
+├── 02_model_export/            # 模型与导出 (OpenPCDet, export_onnx.py)
+├── 03_tensorrt_build/          # TensorRT 高性能引擎构建
+├── 04_ros2_deployment/         # ROS2 C++ 实时感知节点工作空间
+├── 05_simulation_data/         # 点云数据仿真发布脚本
+├── 06_docs_and_results/        # 项目文档与演示记录
+└── models/                     # 模型文件 (onnx, engine) 统一存放处
 ```
 
 ## 开发计划
@@ -56,7 +48,7 @@ lidar_trt_detection/
 - Miniconda (Python 3.10)
 - PyTorch cu124 + spconv-cu120
 
-详细环境配置见 [docs/项目说明书.md](docs/项目说明书.md)
+详细环境配置见 [06_docs_and_results/项目说明书.md](06_docs_and_results/项目说明书.md)
 
 ## 许可证
 
