@@ -16,7 +16,11 @@ class KittiPublisher(Node):
         # Look for kitti bin files
         self.data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'kitti', 'training', 'velodyne')
         if not os.path.exists(self.data_path):
-            self.get_logger().warn(f"KITTI data path {self.data_path} not found. Please place .bin files there.")
+            self.get_logger().info(f"KITTI data path not found. Falling back to demo data.")
+            self.data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'third_party', 'OpenPCDet', 'demo_data')
+            
+        if not os.path.exists(self.data_path):
+            self.get_logger().warn("No data path found!")
             self.files = []
         else:
             self.files = sorted(glob.glob(os.path.join(self.data_path, '*.bin')))

@@ -57,23 +57,33 @@ std::vector<BoundingBox> Postprocess::process(const float* cls_preds, const floa
     float voxel_x = 0.16f, voxel_y = 0.16f;
     float point_cloud_range[6] = {0, -39.68f, -3, 69.12f, 39.68f, 1};
 
+    int num_anchors = 6; // 2 for Car, 2 for Ped, 2 for Cyc
+    int num_classes = 3;
+
     for (int y = 0; y < grid_y; ++y) {
         for (int x = 0; x < grid_x; ++x) {
-            for (int a = 0; a < num_anchors_per_cell * num_classes_; ++a) {
-                int class_id = a / num_anchors_per_cell; // Assuming sequential layout
+            for (int a = 0; a < num_anchors; ++a) {
+                int class_id = a / 2; // 0=Car, 1=Ped, 2=Cyc
                 
-                int idx = y * grid_x * (num_anchors_per_cell * num_classes_) + x * (num_anchors_per_cell * num_classes_) + a;
+                // cls_preds is [1, 496, 432, 18] -> 6 anchors * 3 classes
+                int cls_idx = (y * grid_x + x) * (num_anchors * num_classes) + a * num_classes + class_id;
                 
-                // Sigmoid for classification score
-                float score = 1.0f / (1.0f + std::exp(-cls_preds[idx]));
+                float score = 1.0f / (1.0f + std::exp(-cls_preds[cls_idx]));
                 if (score > score_thresh_) {
-                    int box_idx = (y * grid_x * (num_anchors_per_cell * num_classes_) + x * (num_anchors_per_cell * num_classes_) + a) * num_box_attrs;
+                    // box_preds is [1, 496, 432, 42] -> 6 anchors * 7 attrs
+                    int box_idx = (y * grid_x + x) * (num_anchors * num_box_attrs) + a * num_box_attrs;
                     
-                    // Simple Box Decoding (assuming standard KITTI anchors for PointPillars)
-                    float xa = point_cloud_range[0] + x * voxel_x + voxel_x / 2.0f;
-                    float ya = point_cloud_range[1] + y * voxel_y + voxel_y / 2.0f;
-                    float za = -1.0f; // Simplified anchor z
-                    float wa = 1.6f, la = 3.9f, ha = 1.56f; // Simplified anchor sizes
+                    // Simple Box Decoding (anchor sizes per class)
+                    // Feature map stride is 2, so each grid cell corresponds to 2x2 voxels
+                    float xa = point_cloud_range[0] + x * voxel_x * 2.0f + voxel_x;
+                    float ya = point_cloud_range[1] + y * voxel_y * 2.0f + voxel_y;
+                    float za = -1.0f, wa = 1.6f, la = 3.9f, ha = 1.56f;
+                    
+                    if (class_id == 0) { za = -1.78f; wa = 1.6f; la = 3.9f; ha = 1.56f; }
+                    else if (class_id == 1) { za = -0.6f; wa = 0.6f; la = 0.8f; ha = 1.73f; }
+                    else if (class_id == 2) { za = -0.6f; wa = 0.6f; la = 1.76f; ha = 1.73f; }
+                    
+                    float anchor_rot = (a % 2 == 0) ? 0.0f : 1.57f;
 
                     BoundingBox box;
                     box.x = xa + box_preds[box_idx + 0] * std::sqrt(wa * wa + la * la);
@@ -82,10 +92,11 @@ std::vector<BoundingBox> Postprocess::process(const float* cls_preds, const floa
                     box.dx = std::exp(box_preds[box_idx + 3]) * wa;
                     box.dy = std::exp(box_preds[box_idx + 4]) * la;
                     box.dz = std::exp(box_preds[box_idx + 5]) * ha;
-                    box.heading = box_preds[box_idx + 6]; // + anchor_rot
+                    box.heading = box_preds[box_idx + 6] + anchor_rot;
                     
                     if (dir_cls_preds) {
-                        int dir_idx = idx * 2;
+                        // dir_cls_preds is [1, 496, 432, 12] -> 6 anchors * 2 dirs
+                        int dir_idx = (y * grid_x + x) * (num_anchors * 2) + a * 2;
                         if (dir_cls_preds[dir_idx] < dir_cls_preds[dir_idx + 1]) {
                             box.heading += M_PI;
                         }

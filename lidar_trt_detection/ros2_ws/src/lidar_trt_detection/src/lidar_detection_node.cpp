@@ -26,13 +26,16 @@ public:
         preprocessor_ = std::make_shared<PointCloudPreprocess>(config);
         postprocessor_ = std::make_shared<Postprocess>(3, 0.3f, 0.01f);
 
-        // Grid sizes for PointPillars (KITTI config)
-        grid_y_ = 496;
-        grid_x_ = 432;
+        // Grid sizes for PointPillars head (Feature Map Stride = 2)
+        // BEV Grid is 496x432, Head Grid is 248x216
+        grid_y_ = 248;
+        grid_x_ = 216;
 
-        cls_preds_ = new float[grid_y_ * grid_x_ * 3 * 2]; // 3 classes * 2 anchors
-        box_preds_ = new float[grid_y_ * grid_x_ * 7 * 3 * 2];
-        dir_cls_preds_ = new float[grid_y_ * grid_x_ * 2 * 3 * 2];
+        // 6 anchors per cell. Classes=3.
+        // cls_preds is [1, 248, 216, 18], box_preds is [1, 248, 216, 42], dir_preds is [1, 248, 216, 12]
+        cls_preds_ = new float[grid_y_ * grid_x_ * 18];
+        box_preds_ = new float[grid_y_ * grid_x_ * 42];
+        dir_cls_preds_ = new float[grid_y_ * grid_x_ * 12];
 
         pointcloud_sub_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
             "/points_raw", 10, std::bind(&LidarDetectionNode::pointCloudCallback, this, std::placeholders::_1));
@@ -94,13 +97,6 @@ private:
 
     void publishMarkers(const std::vector<BoundingBox>& boxes, const std_msgs::msg::Header& header) {
         visualization_msgs::msg::MarkerArray marker_array;
-        
-        // Delete all previous markers
-        visualization_msgs::msg::Marker del_marker;
-        del_marker.action = visualization_msgs::msg::Marker::DELETEALL;
-        marker_array.markers.push_back(del_marker);
-        marker_pub_->publish(marker_array);
-        marker_array.markers.clear();
 
         int id = 0;
         for (const auto& box : boxes) {

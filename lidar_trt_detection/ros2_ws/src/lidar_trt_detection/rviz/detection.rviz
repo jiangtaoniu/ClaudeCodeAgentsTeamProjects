@@ -41,7 +41,8 @@ Visualization Manager:
         Value: /points_raw
       Style: Points
       Size (Pixels): 2
-      Color Transformer: Intensity
+      Color Transformer: Flat Color
+      Color: 255; 255; 255
       Name: PointCloud2
       Value: true
     - Class: rviz_default_plugins/MarkerArray

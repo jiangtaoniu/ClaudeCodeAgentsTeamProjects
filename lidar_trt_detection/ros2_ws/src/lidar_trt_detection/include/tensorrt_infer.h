@@ -34,13 +34,12 @@ private:
     std::shared_ptr<nvinfer1::ICudaEngine> engine_;
     std::unique_ptr<nvinfer1::IExecutionContext> context_;
 
-    void* buffers_[6] = {nullptr};
-    int input_index_voxels_ = -1;
-    int input_index_num_points_ = -1;
-    int input_index_coords_ = -1;
-    int output_index_cls_ = -1;
-    int output_index_box_ = -1;
-    int output_index_dir_ = -1;
+    void* buffer_voxels_ = nullptr;
+    void* buffer_num_points_ = nullptr;
+    void* buffer_coords_ = nullptr;
+    void* buffer_cls_ = nullptr;
+    void* buffer_box_ = nullptr;
+    void* buffer_dir_ = nullptr;
 };
 
 #endif // TENSORRT_INFER_H

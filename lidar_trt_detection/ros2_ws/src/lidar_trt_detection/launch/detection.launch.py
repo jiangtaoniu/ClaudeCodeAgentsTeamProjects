@@ -9,7 +9,7 @@ def generate_launch_description():
     
     # Needs absolute path to engine depending on where it's stored.
     # Assuming it's in the workspace root or passed as argument.
-    engine_path = os.path.join(os.getcwd(), 'models', 'engine', 'pointpillar.engine')
+    engine_path = os.path.join(os.getcwd(), '..', 'models', 'engine', 'pointpillar.engine')
 
     return LaunchDescription([
         Node(
