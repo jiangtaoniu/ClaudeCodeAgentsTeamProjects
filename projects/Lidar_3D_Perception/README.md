@@ -101,7 +101,14 @@ Lidar_3D_Perception/
 │   ├── 部署与启动指南.md                #   系统启动与运行手册
 │   └── 基于 ROS2 + TensorRT 的...md    #   系统设计文档
 │
-└── install_all_env.sh                 # 一键环境安装脚本
+├── scripts/                           # 核心运行与安装脚本
+│   ├── install_all_env.sh            #   环境一键安装包 (全自动多层重试机制)
+│   ├── build_engine.sh               #   TensorRT FP16 加速引擎一键编译
+│   ├── run_simulation.sh             #   KITTI 模拟数据发布一键启动
+│   └── run_ros2_node.sh              #   ROS2 推理节点与可视界面一键启动
+│
+└── install_all_env.sh                 # 一键环境安装脚本入口
+```
 ```
 
 ---
@@ -112,7 +119,7 @@ Lidar_3D_Perception/
 
 **目标**：在 WSL2 Ubuntu 22.04 上配置完整开发环境。
 
-8 个脚本按顺序执行，依次安装系统工具、ROS2 Humble、CUDA Toolkit、Miniconda、OpenPCDet + spconv、ONNX Runtime，最后统一验证。也可以用 `install_all_env.sh` 一键执行全部安装。
+8 个脚本按顺序执行，依次安装系统工具、ROS2 Humble、CUDA Toolkit、Miniconda、OpenPCDet + spconv、ONNX Runtime，最后统一验证。也可以在根目录下直接调用 `./install_all_env.sh` 一键执行全部安装。
 
 **为什么用 WSL2 而不是原生 Windows**：ROS2 生态、Autoware、TensorRT 的工具链都围绕 Linux 展开。NVIDIA 官方支持 WSL2 下运行 CUDA/TensorRT，兼顾了 Windows 开发体验和 Linux 运行环境。
 
@@ -320,19 +327,15 @@ chmod +x install_all_env.sh
 **终端 A** — 启动推理节点与 RViz：
 
 ```bash
-cd ~/projects/ClaudeCodeAgentsTeamProjects/projects/Lidar_3D_Perception/04_ros2_deployment
-source /opt/ros/humble/setup.bash
-source install/setup.bash
-ros2 launch lidar_trt_detection detection.launch.py
+cd projects/Lidar_3D_Perception
+./scripts/run_ros2_node.sh
 ```
 
 **终端 B** — 启动点云数据发布：
 
 ```bash
-cd ~/projects/ClaudeCodeAgentsTeamProjects/projects/Lidar_3D_Perception/05_simulation_data
-source /opt/ros/humble/setup.bash
-source ~/miniconda3/bin/activate lidar3d
-python kitti_to_rosbag.py
+cd projects/Lidar_3D_Perception
+./scripts/run_simulation.sh
 ```
 
 启动后 RViz 窗口自动弹出，滚动鼠标滚轮缩小视图即可看到点云和 3D 检测框。

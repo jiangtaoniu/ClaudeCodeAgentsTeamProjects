@@ -2,7 +2,7 @@
 name: image-reader
 description: Use proactively for any image, screenshot, UI mockup, visual bug report, diagram, chart, OCR, or visual analysis task. This agent must be used when the user provides an image path or asks to analyze PNG, JPG, JPEG, WEBP, GIF, screenshot, diagram, UI image, or visual error.
 tools: Read, Glob, Grep
-model: sonnet
+model: gemini-3.1-pro-high
 permissionMode: default
 maxTurns: 8
 ---

@@ -1,12 +1,7 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "model": "opus",
-  "env": {
-    "ANTHROPIC_BASE_URL": "https://token-plan-cn.xiaomimimo.com/anthropic",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "mimo-v2.5-pro[1m]",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "mimo-v2.5[1m]",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "mimo-v2.5[1m]",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  "permissions": {
+    "allow": [
+      "Bash(wsl bash *)"
+    ]
   }
 }

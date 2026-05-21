@@ -2,12 +2,8 @@
 # ==============================================================================
 # Lidar 3D Perception - 工业级自动驾驶点云检测全自动环境配置脚本
 # 适用系统: Ubuntu 22.04 (包含 WSL2)
-# 
-# 本脚本集成了所有必要的系统级和 Python 级依赖，自带断点续传与重试机制，
-# 确保在网络环境不佳的情况下也能全自动配置完毕。
 # ==============================================================================
 
-# 设置严格的错误处理机制
 set -e
 trap 'echo "==========================================="; echo "[错误] 安装脚本在第 $LINENO 行失败，请检查网络或日志。"; echo "==========================================="' ERR
 
@@ -44,7 +40,6 @@ fi
 echo "==========================================="
 echo " 3. 配置 NVIDIA CUDA 源与 TensorRT C++ 依赖"
 echo "==========================================="
-# 必须安装这个，否则编译 ROS2 节点时会找不到 NvInfer.h
 echo "下载并安装 CUDA keyring..."
 wget -c https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb -O /tmp/cuda-keyring_1.1-1_all.deb
 sudo dpkg -i /tmp/cuda-keyring_1.1-1_all.deb
@@ -59,7 +54,6 @@ if [ ! -d "$HOME/miniconda3" ]; then
     wget -c https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
     bash /tmp/miniconda.sh -b -p $HOME/miniconda3
 fi
-# 初始化 conda
 eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
 
 echo "==========================================="
@@ -70,25 +64,19 @@ if ! conda info --envs | grep -q "lidar3d"; then
 fi
 conda activate lidar3d
 
-echo "更新 pip 以支持更好的断点续传..."
+echo "更新 pip..."
 pip install --upgrade pip
 
 echo "==========================================="
 echo " 6. 安装深度学习框架与 Spconv"
 echo "==========================================="
-# 延长 pip 超时时间，防止大文件下载失败
 export PIP_DEFAULT_TIMEOUT=1000
-
-# 明确指定安装带有 CUDA 12.1 后端的 PyTorch 版本
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 pip install spconv-cu120 open3d
 
 echo "==========================================="
-echo " 7. 安装 TensorRT Python API (最容易断网的一步)"
+echo " 7. 安装 TensorRT Python API"
 echo "==========================================="
-echo "此步骤由于下载包体积接近 4.3GB，若网络波动可能失败。"
-echo "脚本已设置重试循环，确保持续下载直至成功。"
-
 MAX_RETRIES=5
 RETRY_COUNT=0
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
@@ -97,10 +85,10 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         echo "TensorRT 安装成功！"
         break
     else
-        echo "[警告] TensorRT 下载或安装失败，可能是网络中断。"
+        echo "[警告] TensorRT 下载或安装失败，可能是网络问题。"
         RETRY_COUNT=$((RETRY_COUNT+1))
         if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-            echo "[错误] 达到最大重试次数！您可以手动执行: pip install tensorrt-cu12 --extra-index-url https://pypi.nvidia.com"
+            echo "[错误] 达到最大重试次数！"
             exit 1
         fi
         echo "等待 5 秒后重试..."
@@ -128,6 +116,5 @@ pip install -r requirements.txt
 python setup.py develop
 
 echo "==========================================="
-echo " ✅ 环境全自动配置完成！"
-echo " 您现在可以参考部署指南启动项目了。"
+echo " ✅ 环境一键配置完成！"
 echo "==========================================="
