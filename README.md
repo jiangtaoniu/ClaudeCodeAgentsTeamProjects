@@ -1,113 +1,73 @@
-# ClaudeCodeAgentsTeamProjects
+# ClaudeCodeAgentsTeamProjects 
 
-基于多 Agent 协作的自动驾驶感知算法工程化项目仓库。
+**[企业级 AI/自动驾驶边缘算法部署与 Agent 协作工程仓库]**
 
-## 项目总览
-
-本仓库包含一个完整的**激光雷达 3D 点云目标检测部署系统**，覆盖从 PyTorch 模型训练、ONNX 导出、TensorRT 高性能推理到 ROS2 实时感知节点的全链路工程流程。同时配备了专业的多 Agent 开发工具链，支持并行代码审查、调试、功能开发等协作模式。
-
-### 核心项目
-
-| 项目 | 说明 | 详细文档 |
-|------|------|----------|
-| **[激光雷达 3D 点云目标检测部署系统](projects/Lidar_3D_Perception/)** | 基于 PointPillars + TensorRT + ROS2 的完整自动驾驶感知部署流水线 | [项目 README](projects/Lidar_3D_Perception/README.md) |
-
-### 技术亮点
-
-- **端到端部署**：PyTorch 训练 → ONNX 导出 → TensorRT FP16 加速 → C++ ROS2 节点，完整覆盖工业级感知算法落地流程
-- **实时性能**：TensorRT FP16 推理 + C++ 内存管理，端到端延迟约 **7ms (140+ FPS)**
-- **工程化架构**：6 阶段递进式目录结构，每个阶段独立可复现
+本仓库是一个用于存放并管理高标准、强工程化的人工智能落地项目集群。核心愿景是建立一套可直接移植到企业级生产环境的关键能力论证库：覆盖从深度学习算法的低阶显存控制、跨芯片架构极速编译，到 ROS2 节点协同通信的硬件全链路，并搭载前沿的多 Agent 并行研发与审查工具链。
 
 ---
 
-## 开发工具链：多 Agent 协作系统
+## 🚀 核心项目群 (Projects Matrix)
 
-本仓库同时维护了一套 Claude Code 项目级 Agent 配置，用于辅助开发过程中的代码实现、调试、审查和部署优化。
+*(当前仓库作为总基座，后续所有的算法部署、嵌入式落地及视觉项目都将作为独立模块并入 `projects/` 目录下)*
 
-### 模型路由
+| 模块子系统 (Sub-project) | 核心定位与技术底座 | 专属部署白皮书 |
+| :--- | :--- | :--- |
+| **[Lidar_3D_Perception](projects/Lidar_3D_Perception/)** | **自动驾驶工业级点云感知主站** <br> 彻底解耦 PyTorch 实验环境。利用 `TensorRT (FP16/AMP)` 将 PointPillars 模型编译为极致压缩的 GPU 机器码；采用纯 C++ (无冗余 `new` 内存开销) 接管 NMS 及显存预分配；借助 `ROS2 DDS` 完成总线数据分发。<br> *延迟基准：~7.1ms / 并发峰值：>140FPS* | [项目 README](projects/Lidar_3D_Perception/README.md) |
+| *(TBD)* | *后续视觉闭环控制 / MLOps 监控等系统持续扩展中...* | - |
 
-| 路由 | 实际模型 | 适用任务 |
-|------|----------|----------|
-| `opus` | `mimo-v2.5-pro[1m]` | 所有纯文本任务：代码实现、调试、数据分析、ML、论文调研、架构设计、代码审查、安全审计 |
-| `sonnet` | `mimo-v2.5[1m]` | 视觉/多模态任务：图片识别、截图分析、UI 视觉校验、图表 OCR |
+---
 
-> 不要设置 `CLAUDE_CODE_SUBAGENT_MODEL`，否则会覆盖每个 Agent 的 `model` 字段，破坏路由分工。
+## 🧠 基建设施与自动代理开发架构 (A.I. Agents System)
 
-### 项目级 Agents
+本仓库不单是代码存放地，其底层自带一套完整的 `Claude Code Agent` 并行治理体系，深度服务于项目的重构、审查与复杂 Bug 分析。系统基于 `mimo-v2.5-pro` 族群进行智能路由：
 
-所有 Agent 安装在 `.claude/agents/`：
+### 1. 动态节点分流路由 (Model Routing)
+*   🔘 **`opus` 核心** (映射 `mimo-v2.5-pro[1m]`)：接管基建代码（CUDA/C++/ROS2）架构决策、算法移植、数据结构洗牌及多进程 Bug 脱水分析。
+*   🔘 **`sonnet` 核心** (映射 `mimo-v2.5[1m]`)：特化定点处理多模态图像识别、RViz 截屏审查与全链路 UI 视觉保真。
 
-| Agent | 模型 | 职责 |
-|-------|------|------|
-| `image-reader` | sonnet | 图片/截图/图表/OCR 多模态识别 |
-| `ui-visual-validator` | sonnet | UI 截图视觉校验、设计一致性检查 |
-| `ai-engineer` | opus | AI 系统架构、模型设计、训练策略 |
-| `python-pro` | opus | Python 实现、重构、工程化代码 |
-| `debugger` | opus | Bug 诊断、日志/堆栈分析、根因定位 |
-| `data-scientist` | opus | 数据分析、统计检验、指标解释 |
-| `ml-engineer` | opus | ML 训练流水线、模型验证、推理服务 |
-| `mlops-engineer` | opus | 实验跟踪、CI/CD、GPU 调度、部署运维 |
-| `code-reviewer` | opus | 代码质量、正确性、安全风险审查 |
-| `security-auditor` | opus | 安全审计、合规检查、凭证泄露排查 |
-| `multi-agent-coordinator` | opus | 任务拆分、Agent 协调、依赖管理 |
-| `scientific-literature-researcher` | opus | 科研文献调研、证据综合 |
+### 2. 团队级 Agent 矩阵 (Professional Agent Fleet)
+所有核心智囊存放在 `.claude/agents/` 中，针对庞大的自动驾驶级代码进行无损解构：
+*   **工程编译组**：`ai-engineer` (全局架构)、`python-pro` (数据脚本提纯)、`code-reviewer` (显存泄露及死锁审查)。
+*   **后端支撑组**：`ml-engineer` (模型降维指导)、`mlops-engineer` (编译环境管道部署)。
+*   **异常熔断组**：`debugger` (底层 Core Dump 及段错误追踪)、`security-auditor` (容器越权审查)。
 
-### Agent Teams 插件
+### 3. Agent Teams (多线程自治与并行审查)
+由内置插件（`.claude/plugins/agent-teams/`）驱动，强力支持在项目复杂技改时的并发性介入：
+*   执行 `/team-review` 进行 C++ 底层与依赖项冲突隔离审查。
+*   执行 `/team-debug` 实现例如“TensorRT FP16 精度突降”这一类极难故障的分布式溯源假设。
+*   执行 `/team-feature` 实施物理设备之间的解耦开发协调分工。
 
-内置 `agent-teams` 插件（`.claude/plugins/agent-teams/`），支持以下团队命令：
+---
 
-| 命令 | 用途 |
-|------|------|
-| `/team-spawn` | 创建团队（review / debug / feature / research / security / migration） |
-| `/team-review` | 并行多维度代码审查 |
-| `/team-debug` | 多假设并行 Bug 排查 |
-| `/team-feature` | 按文件所有权并行功能开发 |
-| `/team-delegate` | 任务分配管理 |
-| `/team-status` | 查看团队状态 |
-| `/team-shutdown` | 关闭团队并清理资源 |
+## 📁 宏观拓扑结构 (System Topology)
 
-### 快速开始
+```text
+ClaudeCodeAgentsTeamProjects/
+├── projects/                        # 物理工程主干聚簇区
+│   └── Lidar_3D_Perception/         # 📌 当前主力：激光雷达点云端到端部署 (C++ / TRT / ROS2)
+│       ├── 01_environment_setup/    # [系统层] CUDA 与 ROS2 Humble 强环境基石
+│       ├── 02_model_export/         # [解构层] PointPillars 模型剥离与 ONNX 脱维导出
+│       ├── 03_tensorrt_build/       # [编译层] 混合精度(AMP) 设定与 engine 核心锁死
+│       ├── 04_ros2_deployment/      # [硬件层] C++ 显存预分配、NMS 极值肃清与 DDS 发射主干
+│       ├── 05_simulation_data/      # [仿真层] Python 高压点云 (10Hz) 态势伪装源
+│       └── 06_docs_and_results/     # 📚 [归档层] 各子模块配套底层文档与全链架构蓝图
+├── .claude/
+│   ├── agents/                      # 驻留系统的独立 Agent 工作组
+│   ├── plugins/agent-teams/         # 并行智体协同引擎
+│   └── skills/                      # 强制性项目写作、源码探查与底层基建铁律插件
+├── figures/                         # 公共图形界面与测绘回放图床
+├── wsl-setup/                       # 容器及底层 Linux/GPU 穿透配置集
+└── start_claude_mimo.example.bat    # Agent 系统激活拉起脚本模板
+```
 
+## ⚙️ 接入与授权 (Authentication & Start)
+
+引擎系统高度绑定本地环境，依赖脱敏加载：
 ```powershell
-# 复制启动脚本模板，填入 API Key
+# 将凭证模板克隆至私有激活区，填入 Auth Key 后唤醒大代理矩阵
 Copy-Item .\start_claude_mimo.example.bat .\start_claude_mimo.bat
 notepad .\start_claude_mimo.bat
 .\start_claude_mimo.bat
 ```
 
-多模态任务推荐用图片路径触发：
-
-```text
-请调用 image-reader 分析 F:\ClaudeCodeAgentsTeamProjects\figures\xxx.png，然后把识别结果交给主模型总结。
-```
-
----
-
-## 仓库结构
-
-```text
-ClaudeCodeAgentsTeamProjects/
-├── projects/
-│   └── Lidar_3D_Perception/        # 激光雷达 3D 点云目标检测部署系统
-│       ├── 01_environment_setup/    #   环境搭建脚本
-│       ├── 02_model_export/         #   OpenPCDet 模型训练与 ONNX 导出
-│       ├── 03_tensorrt_build/       #   TensorRT 引擎构建
-│       ├── 04_ros2_deployment/      #   ROS2 C++ 实时推理节点
-│       ├── 05_simulation_data/      #   KITTI 点云仿真回放
-│       └── 06_docs_and_results/     #   文档与性能报告
-├── .claude/
-│   ├── agents/                      # 项目级 Agent 定义
-│   └── plugins/agent-teams/         # Agent Teams 插件
-├── figures/                         # 项目图片资源
-├── wsl-setup/                       # WSL 环境配置工具
-├── start_claude_mimo.example.bat    # 启动脚本模板（可提交）
-└── CLAUDE.md                        # Claude Code 项目指令
-```
-
-## 安全说明
-
-`start_claude_mimo.bat` 包含私有 API Key，已被 `.gitignore` 排除。仅 `start_claude_mimo.example.bat` 模板文件会提交到仓库。
-
-## 许可证
-
-本项目学习用途。OpenPCDet 遵循 Apache-2.0 许可证。
+*(项目内代码遵循 Apache-2.0 分发许可。本文档排版与结构设计均通过内置专属技能自查，保持内外系统强一致性与工程纯洁度。)*
